@@ -14,7 +14,7 @@ defmodule FinancialSystem.Transaction do
     iex> change_user(user)
       %Ecto.changeset(source: %User{})
   """
-  def change_ser(%User{} = user) do
+  def change_user(%User{} = user) do
     User.changeset(user, %{})
   end
 
@@ -27,7 +27,6 @@ defmodule FinancialSystem.Transaction do
       [%User{}, ...]
 
   """
-
   def list_users do
     Repo.all(User)
   end
