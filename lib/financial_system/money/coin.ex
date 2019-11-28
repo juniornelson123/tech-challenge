@@ -1,4 +1,8 @@
 defmodule FinancialSystem.Money.Coin do
+  @moduledoc """
+  Currencies ISO4217
+  """
+
   @coins [
     %{
       name: "UAE Dirham",
@@ -992,11 +996,41 @@ defmodule FinancialSystem.Money.Coin do
     }
   ]
 
+  @doc """
+  Return list of currencies iso 4217
+
+    ##Examples
+
+    iex> get_coins
+      [
+        %{
+          name: "UAE Dirham",
+          code: "AED",
+          num_code: 784,
+          multiplier: 2
+        },
+        ...
+      ]
+  """
   def get_coins do
     @coins
   end
 
+  @doc """
+  Return currency by code
+
+    ##Examples
+
+      iex> get_by_code(BRL)
+      %{
+        name: "Brazilian Real",
+        code: "BRL",
+        num_code: 986,
+        multiplier: 2
+      }
+
+  """
   def get_by_code(code) do
-    @coins |> Enum.find(&(String.to_atom(&1.code) == code))
+    @coins |> Enum.find(&(&1.code == code))
   end
 end
