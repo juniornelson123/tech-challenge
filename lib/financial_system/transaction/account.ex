@@ -12,7 +12,7 @@ defmodule FinancialSystem.Transaction.Account do
 
   def changeset(account, params \\ %{}) do
     account
-    |> cast(params, [:name, :email, :phone, :user_id])
-    |> validate_required([:name, :email, :phone, :user_id])
+    |> cast(params, [:currency, :balance, :user_id])
+    |> validate_required([:currency, :balance, :user_id])
   end
 end
