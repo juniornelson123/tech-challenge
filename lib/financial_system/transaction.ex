@@ -179,4 +179,178 @@ defmodule FinancialSystem.Transaction do
     Repo.delete(account)
   end
 
+  alias FinancialSystem.Transaction.Item
+
+  @doc """
+  Return %Ecto.Changeset{} for verify user changes
+
+  ##Examples
+    iex> change_item(item)
+      %Ecto.changeset(source: %Item{})
+  """
+  def change_item(%Item{} = item) do
+    Item.changeset(item, %{})
+  end
+
+  @doc """
+  Return list of items
+
+    ##Examples
+
+      iex> list_items()
+      [%Item{}, ...]
+
+  """
+  def list_items do
+    Repo.all(Item)
+  end
+
+  @doc """
+  Get single item by id
+
+  Raises Ecto.NoResultsError if item not exist
+
+    ##Examples
+
+      iex> get_item!(1)
+        %Item{}
+
+      iex> get_item!(0)
+        ** (Ecto.NoResultError)
+  """
+  def get_item!(id), do: Repo.get!(Item, id)
+
+  @doc """
+  Create item
+
+    ##Examples
+      iex> create_item(%{field: value})
+        {:ok, %Item{}}
+
+      iex> create_item(%{field: invald_value})
+        {:error, %Ecto.Changeset{}}
+  """
+  def create_item(attrs \\ %{}) do
+    %Item{}
+    |> Item.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Update item
+
+    ##Examples
+      iex> update_item(item, %{field: value})
+        {:ok, %Item{}}
+
+      iex> update_item(item, %{field: invald_value})
+        {:error, %Ecto.Changeset{}}
+  """
+  def update_item(%Item{} = item, attrs) do
+    item
+    |> Item.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Delete item
+
+    ##Examples
+      iex> delete_item(item)
+        {:ok, %Item{}}
+
+      iex> delete_item(item)
+        {:error, %Ecto.Changeset{}}
+  """
+  def delete_item(%Item{} = item) do
+    Repo.delete(item)
+  end
+
+  alias FinancialSystem.Transaction.Transfer
+
+  @doc """
+  Return %Ecto.Changeset{} for verify user changes
+
+  ##Examples
+    iex> change_transfer(transfer)
+      %Ecto.changeset(source: %Transfer{})
+  """
+  def change_transfer(%Transfer{} = transfer) do
+    Transfer.changeset(transfer, %{})
+  end
+
+  @doc """
+  Return list of transfers
+
+    ##Examples
+
+      iex> list_transfers()
+      [%Transfer{}, ...]
+
+  """
+  def list_transfers do
+    Repo.all(Transfer)
+  end
+
+  @doc """
+  Get single transfer by id
+
+  Raises Ecto.NoResultsError if transfer not exist
+
+    ##Examples
+
+      iex> get_transfer!(1)
+        %Transfer{}
+
+      iex> get_transfer!(0)
+        ** (Ecto.NoResultError)
+  """
+  def get_transfer!(id), do: Repo.get!(Transfer, id)
+
+  @doc """
+  Create transfer
+
+    ##Examples
+      iex> create_transfer(%{field: value})
+        {:ok, %Transfer{}}
+
+      iex> create_transfer(%{field: invald_value})
+        {:error, %Ecto.Changeset{}}
+  """
+  def create_transfer(attrs \\ %{}) do
+    %Transfer{}
+    |> Transfer.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Update transfer
+
+    ##Examples
+      iex> update_transfer(transfer, %{field: value})
+        {:ok, %Transfer{}}
+
+      iex> update_transfer(transfer, %{field: invald_value})
+        {:error, %Ecto.Changeset{}}
+  """
+  def update_transfer(%Transfer{} = transfer, attrs) do
+    transfer
+    |> Transfer.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Delete transfer
+
+    ##Examples
+      iex> delete_transfer(transfer)
+        {:ok, %Transfer{}}
+
+      iex> delete_transfer(transfer)
+        {:error, %Ecto.Changeset{}}
+  """
+  def delete_transfer(%Transfer{} = transfer) do
+    Repo.delete(transfer)
+  end
+
 end
