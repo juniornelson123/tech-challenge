@@ -2,6 +2,7 @@ defmodule FinancialSystem do
   @moduledoc """
   Documentation for FinancialSystem.
   """
+  alias Ecto.Multi
   alias FinancialSystem.Repo
   alias FinancialSystem.Transaction
   alias FinancialSystem.Transaction.Account
@@ -15,7 +16,21 @@ defmodule FinancialSystem do
     #Register transfer
     {_, transfer} = register_transfer(account_from.id, value)
 
+    case Repo.transaction(fn -> 
+      accounts |> Enum.map(fn account ->
+        {:ok, item} = register_item(account.value, account.account_id, transfer.id)
 
+        item = item |> Repo.preload(:account_received)
+        transfer_account(account_from, item.account_received, item)
+      end)
+    end) do
+      {:ok, message} -> 
+        update_transfer(transfer, true, message)
+        {:ok, message}
+      {:error, message} -> 
+        update_transfer(transfer, false, message)
+        {:error, message}
+    end
   end
 
   @doc """
@@ -25,7 +40,22 @@ defmodule FinancialSystem do
     #Register transfer
     case register_transfer(account_from.id, value) do
       {:ok, transfer} ->
-        transfer_account(account_from, account_received, transfer)
+        case Repo.transaction(fn ->
+          #Register item of transfer
+          {:ok, item} = register_item(transfer.value, account_received.id, transfer.id)
+
+          transfer_account(account_from, account_received, item)
+
+        end) do
+          {:ok, message} ->
+            #Updated transfer with status and reason
+            update_transfer(transfer, true, message)
+            {:ok, message}
+          {:error, message} ->
+            #Updated transfer with status and reason
+            update_transfer(transfer, false, message)
+            {:error, message}
+        end  
       {:error, changeset} ->
         {:error, changeset}
     end
@@ -34,27 +64,26 @@ defmodule FinancialSystem do
   @doc """
   Transfer value between accounts
   """
-  defp transfer_account(%Account{} = account_from, %Account{} = account_received, transfer) do
-    case Repo.transaction(fn ->
-      if account_from.balance >= transfer.value do
-        #Register item of transfer
-        register_item(transfer.value, account_received.id, transfer.id)
+  defp transfer_account(%Account{} = account_from, %Account{} = account_received, item) do
+    if account_from.balance >= item.value do
 
-        #Updated balance for account from
-        update_account(account_from, account_from.balance - transfer.value)
-        #Updated balance for account received
-        update_account(account_received, account_received.balance + transfer.value)
-      else
-        Repo.rollback("Insufficient funds")
+      #Updated balance for account from
+      case Transaction.update_account(account_from, %{balance: account_from.balance - item.value}) do
+        {:ok, account} ->
+          "Successful transfer"
+        {:error, %Ecto.Changeset{} = changeset} ->
+          Repo.rollback("Unable transfer account")
       end
-    end) do
-
-      {:ok, message} ->
-        #Updated transfer with status and reason
-        update_transfer(transfer, true, message)
-      {:error, message} ->
-        #Updated transfer with status and reason
-        update_transfer(transfer, false, message)
+      
+      #Updated balance for account received
+      case Transaction.update_account(account_received, %{balance: account_received.balance + item.value}) do
+        {:ok, account} ->
+          "Successful transfer"
+        {:error, %Ecto.Changeset{} = changeset} ->
+          Repo.rollback("Unable transfer account")
+      end
+    else
+      Repo.rollback("Insufficient funds")
     end
   end
 
@@ -69,26 +98,14 @@ defmodule FinancialSystem do
   end
 
   @doc """
-  Update balance from account
-  """
-  defp update_account(account, value) do
-    case Transaction.update_account(account, %{balance: value}) do
-      {:ok, account} ->
-        "Successful transfer"
-      {:error, %Ecto.Changeset{} = changeset} ->
-        Repo.rollback("Unable transfer")
-    end
-  end
-
-  @doc """
   Set status transfer
   """
   def update_transfer(transfer, status, message) do
     case Transaction.update_transfer(transfer, %{success: status, reason: message}) do
       {:ok, transfer} ->
-        message
+        {:ok, message}
       {:error, %Ecto.Changeset{} = changeset} ->
-        Repo.rollback("Unable transfer")
+        {:error, "Unable update transfer"}
     end
   end
 
