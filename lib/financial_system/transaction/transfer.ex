@@ -4,7 +4,10 @@ defmodule FinancialSystem.Transaction.Transfer do
 
   schema "transfers" do
     field :value, :integer
-    field :currency, :string
+    field :success, :boolean
+    field :reason, :string
+    belongs_to :account, FinancialSystem.Transaction.Account
+
     has_many :items, FinancialSystem.Transaction.Item
 
     timestamps()
@@ -12,8 +15,8 @@ defmodule FinancialSystem.Transaction.Transfer do
 
   def changeset(transfer, params \\ %{}) do
     transfer
-    |> cast(params, [:value, :currency])
-    |> validate_required([:value, :currency])
+    |> cast(params, [:value, :reason, :success, :account_id])
+    |> validate_required([:value, :reason, :account_id])
   end
 
 end

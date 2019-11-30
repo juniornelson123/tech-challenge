@@ -4,7 +4,10 @@ defmodule FinancialSystem.Repo.Migrations.CreateTransfer do
   def change do
     create table(:transfers) do
       add :value, :integer
-      add :currency, :string
+      add :success, :boolean, default: false
+      add :reason, :string
+      add :account_id, references(:accounts)
+
 
       timestamps()
     end

@@ -4,7 +4,7 @@ defmodule FinancialSystem.Repo.Migrations.CreateItem do
   def change do
     create table(:items) do
       add :value, :integer
-      add :account_id, references(:accounts)
+      add :account_received_id, references(:accounts)
       add :transfer_id, references(:transfers)
 
       timestamps()
