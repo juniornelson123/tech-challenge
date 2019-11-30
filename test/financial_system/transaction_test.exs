@@ -134,16 +134,36 @@ defmodule FinancialSystem.TransactionTest do
 
   describe "transfers" do
 
-    @valid_transfer %{currency: "BRL", value: 30000}
-    @update_transfer %{value: 40000}
-    @invalid_transfer %{currency: nil, value: nil}
+    @valid_transfer %{value: 30000, reason: "Created Transfer", success: false}
+    @update_transfer %{value: 40000, reason: "Transfer Completed", success: true}
+    @invalid_transfer %{value: nil}
+
+    @valid_user %{name: "name", email: "email@gmail.com", phone: "00000000"}
+    @valid_account %{currency: "BRL", balance: 20000, user_id: 1}
+    @update_account %{balance: 40000}
+    @invalid_account %{currency: nil, balance: nil, user_id: nil}
+
+    def user_fixture() do
+      {:ok, user} = Transaction.create_user(@valid_user)
+
+      user
+    end
+
+    def account_fixture(account) do
+      user = user_fixture()
+
+      {:ok, account} = Map.put(@valid_account, :user_id, user.id) |> Transaction.create_account
+
+      account
+    end
 
     def transfer_fixture() do
-      {:ok, transfer} = Transaction.create_transfer(@valid_transfer)
+      account = account_fixture()
+
+      {:ok, transfer} = Map.put(@valid_transfer, :account_id, account.id) |> Transaction.create_transfer
 
       transfer
     end
-
 
     test "list_transfers/0 return list for all transfers" do
       transfer = transfer_fixture()
@@ -160,9 +180,13 @@ defmodule FinancialSystem.TransactionTest do
     end
 
     test "create_transfer/1 with valid values return transfer created" do
-      assert {:ok, transfer} = Transaction.create_transfer(@valid_transfer)
+      account = account_fixture()
+
+      transfer_params = Map.put(@valid_transfer, :account_id, account.id)
+
+      assert {:ok, transfer} = Transaction.create_transfer(transfer_params)
       assert transfer.value == 30000
-      assert transfer.currency == "BRL"
+      assert transfer.account_id == account.id
     end
 
     test "create_transfer/1 with invalid values return error changeset" do
@@ -220,7 +244,7 @@ defmodule FinancialSystem.TransactionTest do
       transfer = transfer_fixture()
 
       {:ok, item} = Map.put(@valid_item, :transfer_id, transfer.id)
-                    |> Map.put(:account_id, account.id)
+                    |> Map.put(:account_received_id, account.id)
                     |> Transaction.create_item
 
       item
@@ -245,11 +269,11 @@ defmodule FinancialSystem.TransactionTest do
       transfer = transfer_fixture()
 
       assert {:ok, item} = Map.put(@valid_item, :transfer_id, transfer.id)
-                    |> Map.put(:account_id, account.id)
+                    |> Map.put(:account_received_id, account.id)
                     |> Transaction.create_item
       assert item.value == 20000
       assert item.transfer_id == transfer.id
-      assert item.account_id == account.id
+      assert item.account_received_id == account.id
     end
 
     test "create_item/1 with invalid values return error changeset" do
