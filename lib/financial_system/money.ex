@@ -13,7 +13,8 @@ defmodule FinancialSystem.Money do
       10.1
   """
   def get_value(value, currency) do
-    value / :math.pow(10, Coin.get_by_code(currency).multiplier)
+    multiplier = :math.pow(10, Coin.get_by_code(currency).multiplier)
+    value / multiplier |> Float.ceil(Coin.get_by_code(currency).multiplier)
   end
 
   @doc """
