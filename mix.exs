@@ -17,7 +17,7 @@ defmodule FinancialSystem.Mixfile do
   def application do
     [
       mod: {FinancialSystem.Application, []},
-      extra_applications: [:logger]
+      extra_applications: [:logger, :httpotion]
     ]
   end
 
@@ -25,7 +25,9 @@ defmodule FinancialSystem.Mixfile do
   defp deps do
     [
       {:ecto_sql, "~> 3.0"},
-      {:postgrex, ">= 0.0.0"}
+      {:postgrex, ">= 0.0.0"},
+      {:httpotion, "~> 3.1.0"},
+      {:poison, "~> 3.1"}
     ]
   end
 
