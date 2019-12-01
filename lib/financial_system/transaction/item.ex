@@ -14,6 +14,7 @@ defmodule FinancialSystem.Transaction.Item do
     item
     |> cast(params, [:value, :account_received_id, :transfer_id])
     |> validate_required([:value, :account_received_id, :transfer_id])
+    |> foreign_key_constraint(:account_received_id, message: "account received invalid")
   end
 
 end

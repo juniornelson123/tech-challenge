@@ -14,5 +14,6 @@ defmodule FinancialSystem.Transaction.Account do
     account
     |> cast(params, [:currency, :balance, :user_id])
     |> validate_required([:currency, :balance, :user_id])
+    |> foreign_key_constraint(:user_id, message: "user invalid")
   end
 end

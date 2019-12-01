@@ -17,6 +17,7 @@ defmodule FinancialSystem.Transaction.Transfer do
     transfer
     |> cast(params, [:value, :reason, :success, :account_id])
     |> validate_required([:value, :reason, :account_id])
+    |> foreign_key_constraint(:account_id, message: "account invalid")
   end
 
 end
