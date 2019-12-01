@@ -1,6 +1,8 @@
 defmodule FinancialSystemTest do
   use FinancialSystem.RepoCase
   alias FinancialSystem.Transaction
+  alias FinancialSystem.Money.Coin
+  alias FinancialSystem.Money
   doctest FinancialSystem
 
   def user_fixture(index) do
@@ -70,11 +72,28 @@ defmodule FinancialSystemTest do
     assert account2.balance == 240
   end
 
-  # test "User should be able to exchange money between different currencies" do
-  #   assert :false
-  # end
+  test "User should be able to exchange money between different currencies" do
+    currency_from = "BRL"
+    currency_to = "USD"
 
-  # test "Currencies should be in compliance with ISO 4217" do
-  #   assert :false
-  # end
+    #convert value decimal/float to integer
+    value_brl = Money.parse_value(1.18, currency_from)
+
+    assert {:ok, value} = FinancialSystem.convert(currency_from, currency_to, 100)
+  end
+
+  test "Currencies should be in compliance with ISO 4217" do
+    assert Coin.get_by_code("BRL") == %{
+      name: "Brazilian Real",
+      code: "BRL",
+      num_code: 986,
+      multiplier: 2
+    }
+    assert Coin.get_by_code("TND") == %{
+      name: "Tunisian Dinar",
+      code: "TND",
+      num_code: 788,
+      multiplier: 3
+    }
+  end
 end
